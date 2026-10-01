@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkSphere — Parking Management System</title>
+<style>
+:root{
+  --bg:#07111f;
+  --bg2:#0c1b2d;
+  --card:rgba(15,31,51,.78);
+  --line:rgba(255,255,255,.09);
+  --text:#f5f8fc;
+  --muted:#9db0c5;
+  --primary:#27d3a2;
+  --primary2:#55a7ff;
+  --warning:#ffcb6b;
+  --shadow:0 24px 70px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(39,211,162,.12),transparent 30%),
+    radial-gradient(circle at 85% 15%,rgba(85,167,255,.12),transparent 28%),
+    var(--bg);
+  color:var(--text);
+  line-height:1.6;
+}
+a{color:inherit;text-decoration:none}
+.container{width:min(1160px,92%);margin:auto}
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  background:rgba(7,17,31,.72);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{height:72px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.15rem;font-weight:900;letter-spacing:.3px}
+.logo span{color:var(--primary)}
+.nav-links{display:flex;gap:22px;font-size:.9rem;color:var(--muted)}
+.nav-links a:hover{color:#fff}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 18px;border-radius:12px;font-weight:800;
+  background:linear-gradient(135deg,var(--primary),#18b78e);
+  color:#03140f;box-shadow:0 10px 30px rgba(39,211,162,.18);
+  transition:.25s;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn.secondary{background:transparent;color:#fff;border:1px solid var(--line);box-shadow:none}
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:50px;align-items:center}
+.badge{
+  display:inline-flex;padding:7px 11px;border:1px solid rgba(39,211,162,.25);
+  border-radius:999px;color:var(--primary);background:rgba(39,211,162,.07);
+  font-size:.78rem;font-weight:800;margin-bottom:18px;
+}
+h1{font-size:clamp(3rem,7vw,5.8rem);line-height:.98;letter-spacing:-4px}
+.gradient{background:linear-gradient(120deg,#fff 15%,#7debc9 55%,#72b7ff);-webkit-background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:1.08rem;max-width:650px;margin:24px 0}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.hero-card{
+  position:relative;padding:24px;border:1px solid var(--line);border-radius:28px;
+  background:linear-gradient(160deg,rgba(26,50,76,.9),rgba(10,23,39,.82));
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.hero-card:before{content:"";position:absolute;width:190px;height:190px;border-radius:50%;background:var(--primary);filter:blur(70px);opacity:.13;right:-50px;top:-50px}
+.parking-map{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.slot{height:72px;border-radius:13px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:900}
+.slot.free{background:rgba(39,211,162,.12);color:var(--primary)}
+.slot.busy{background:rgba(255,203,107,.10);color:var(--warning)}
+.slot.blue{background:rgba(85,167,255,.11);color:var(--primary2)}
+.section{padding:100px 0}
+.section-head{max-width:720px;margin-bottom:42px}
+.kicker{color:var(--primary);font-size:.78rem;text-transform:uppercase;letter-spacing:2px;font-weight:900}
+h2{font-size:clamp(2rem,4vw,3.3rem);line-height:1.05;margin:10px 0 14px;letter-spacing:-1.5px}
+.section-head p{color:var(--muted)}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{
+  padding:25px;border:1px solid var(--line);border-radius:20px;
+  background:var(--card);box-shadow:0 14px 45px rgba(0,0,0,.12);
+}
+.card h3{margin:12px 0 7px;font-size:1.08rem}
+.card p{color:var(--muted);font-size:.94rem}
+.icon{
+  width:44px;height:44px;border-radius:13px;display:grid;place-items:center;
+  background:rgba(39,211,162,.1);color:var(--primary);font-size:1.25rem;
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.stat{padding:20px;border-radius:17px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+.stat strong{display:block;font-size:1.9rem}.stat span{color:var(--muted);font-size:.85rem}
+.problem{border-left:3px solid var(--primary)}
+.workflow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.step{flex:1;min-width:140px;text-align:center;padding:22px 14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035)}
+.step b{display:block;color:var(--primary);font-size:.8rem;margin-bottom:7px}
+.role{position:relative;overflow:hidden}
+.role:after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;right:-50px;bottom:-60px;background:var(--primary);filter:blur(35px);opacity:.08}
+.feature-list{display:grid;gap:10px;margin-top:15px}
+.feature-list li{list-style:none;padding:11px 12px;border-radius:10px;background:rgba(255,255,255,.035);color:#dbe7f3}
+.tech{display:flex;flex-wrap:wrap;gap:12px}
+.tech span{padding:13px 17px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);font-weight:800}
+.architecture{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:center}
+.arch-box{padding:25px;text-align:center;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035)}
+.arrow{text-align:center;color:var(--primary);font-size:1.6rem}
+.cta{
+  text-align:center;padding:80px 25px;border:1px solid rgba(39,211,162,.18);border-radius:30px;
+  background:linear-gradient(135deg,rgba(39,211,162,.08),rgba(85,167,255,.06));
+}
+footer{padding:35px 0;color:var(--muted);border-top:1px solid var(--line);font-size:.88rem}
+.reveal{opacity:0;transform:translateY(22px);transition:.7s ease}
+.reveal.show{opacity:1;transform:none}
+@media(max-width:850px){
+  .nav-links{display:none}
+  .hero-grid,.grid-3,.grid-2,.architecture{grid-template-columns:1fr}
+  h1{letter-spacing:-2px}
+  .stats{grid-template-columns:1fr}
+  .hero{padding-top:105px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="#home">Park<span>Sphere</span></a>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#solution">Solution</a>
+      <a href="#roles">Roles</a>
+      <a href="#features">Features</a>
+      <a href="#tech">Technology</a>
+    </div>
+    <a class="btn" href="#solution">Find Parking</a>
+  </div>
+</nav>
+
+<main id="home">
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <div class="badge">SMART PARKING MANAGEMENT SYSTEM</div>
+      <h1>Find. <span class="gradient">Book.</span> Park.</h1>
+      <p>A modern, scalable parking platform designed to make parking as easy as booking a movie ticket — with search, availability, reservation and centralized management.</p>
+      <div class="actions">
+        <a class="btn" href="#solution">Explore System →</a>
+        <a class="btn secondary" href="#features">View Features</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>20 min</strong><span>Typical search time highlighted in the presentation</span></div>
+        <div class="stat"><strong>3</strong><span>User roles: Customer, Staff, Admin</span></div>
+        <div class="stat"><strong>4</strong><span>Core technologies used</span></div>
+      </div>
+    </div>
+    <div class="hero-card reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><small style="color:var(--muted)">LIVE PARKING VIEW</small><h3 style="font-size:1.35rem">Downtown Parking</h3></div>
+        <span class="badge" style="margin:0">● LIVE</span>
+      </div>
+      <div class="parking-map">
+        <div class="slot free">A1</div><div class="slot blue">A2</div><div class="slot busy">A3</div><div class="slot free">A4</div>
+        <div class="slot busy">B1</div><div class="slot free">B2</div><div class="slot free">B3</div><div class="slot blue">B4</div>
+        <div class="slot free">C1</div><div class="slot busy">C2</div><div class="slot free">C3</div><div class="slot free">C4</div>
+      </div>
+      <div style="display:flex;gap:18px;margin-top:18px;color:var(--muted);font-size:.82rem">
+        <span>● Available</span><span>● Occupied</span><span>● Reserved</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="problem">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">01 · Introduction</div>
+    <h2>The everyday friction of parking</h2>
+    <p>Parking search wastes time, fuel and attention. ParkSphere focuses on making availability visible before the driver reaches the parking area.</p>
+  </div>
+  <div class="grid-3">
+    <div class="card problem reveal"><div class="icon">⏱</div><h3>15–20 Minutes Searching</h3><p>Time lost before the trip even begins.</p></div>
+    <div class="card problem reveal"><div class="icon">⛽</div><h3>Fuel Wasted</h3><p>Circling blocks burns fuel and increases emissions.</p></div>
+    <div class="card problem reveal"><div class="icon">⚠</div><h3>Parking Fines</h3><p>Illegal parking can quickly turn into costly penalties.</p></div>
+  </div>
+</div>
+</section>
+
+<section class="section" id="solution">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">02 · Solution</div>
+    <h2>One platform from search to park</h2>
+    <p>An end-to-end smart parking platform where users discover, reserve and access parking while operators manage space efficiently.</p>
+  </div>
+  <div class="workflow reveal">
+    <div class="step"><b>01</b>Search</div>
+    <div class="step"><b>02</b>View Availability</div>
+    <div class="step"><b>03</b>Book Slot</div>
+    <div class="step"><b>04</b>Navigate</div>
+    <div class="step"><b>05</b>Park</div>
+  </div>
+  <div class="grid-3" style="margin-top:20px">
+    <div class="card reveal"><div class="icon">⌕</div><h3>Smart Search</h3><p>Find parking using availability and relevant options.</p></div>
+    <div class="card reveal"><div class="icon">✓</div><h3>Simple Booking</h3><p>Select a slot and reserve it in seconds.</p></div>
+    <div class="card reveal"><div class="icon">◉</div><h3>Centralized Operations</h3><p>Give staff and administrators one place to monitor activity.</p></div>
+  </div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">03 · Objectives</div>
+    <h2>Designed around practical outcomes</h2>
+  </div>
+  <div class="grid-2">
+    <div class="card reveal"><div class="icon">⌛</div><h3>Save Time</h3><p>Reduce average parking-search duration with faster reservations and visibility.</p></div>
+    <div class="card reveal"><div class="icon">♻</div><h3>Reduce Fuel</h3><p>Lower emissions by minimizing unnecessary cruising and idle driving.</p></div>
+    <div class="card reveal"><div class="icon">≋</div><h3>Reduce Traffic</h3><p>Decrease congestion in parking areas with smoother space allocation.</p></div>
+    <div class="card reveal"><div class="icon">☺</div><h3>Better User Experience</h3><p>Deliver an intuitive, seamless booking interface from search to park.</p></div>
+  </div>
+</div>
+</section>
+
+<section class="section" id="roles">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">04 · User Roles & Workflows</div>
+    <h2>Different users, one connected system</h2>
+  </div>
+  <div class="grid-3">
+    <div class="card role reveal">
+      <div class="icon">👤</div><h3>Customer</h3><p>Register, search, book, receive confirmation and view history.</p>
+      <ul class="feature-list"><li>Search available parking slots</li><li>View options and select a slot</li><li>Book and receive confirmation</li></ul>
+    </div>
+    <div class="card role reveal">
+      <div class="icon">🛠</div><h3>Staff</h3><p>Monitor bookings, update slot status, assist customers and report incidents.</p>
+      <ul class="feature-list"><li>Log in to operations dashboard</li><li>Monitor live bookings</li><li>Update slot status</li></ul>
+    </div>
+    <div class="card role reveal">
+      <div class="icon">⚙</div><h3>Admin</h3><p>Manage users, parking areas, floors, slots and bookings.</p>
+      <ul class="feature-list"><li>Manage users and permissions</li><li>Organize areas, floors and slots</li><li>Review bookings and reports</li></ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="section" id="features">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">05 · Core Features</div>
+    <h2>Everything needed to manage parking</h2>
+  </div>
+  <div class="grid-3">
+    <div class="card reveal"><h3>Customer Features</h3><ul class="feature-list"><li>Smart Search</li><li>Real-time Availability</li><li>Slot Booking</li><li>Booking History</li><li>User Profile</li></ul></div>
+    <div class="card reveal"><h3>Staff Features</h3><ul class="feature-list"><li>Live Monitoring</li><li>Slot Updates</li><li>Booking Verification</li><li>Incident Assistance</li></ul></div>
+    <div class="card reveal"><h3>Admin Features</h3><ul class="feature-list"><li>Dashboard</li><li>User Management</li><li>Parking Area Management</li><li>Incident Reporting</li><li>Floor Management</li><li>Slot Management</li><li>Reports & Analytics</li></ul></div>
+  </div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">06 · Architecture</div>
+    <h2>Simple layered system architecture</h2>
+    <p>The presentation identifies a parking management system architecture and database/ER model as core project components.</p>
+  </div>
+  <div class="architecture reveal">
+    <div class="arch-box"><strong>Frontend</strong><p style="color:var(--muted);margin-top:6px">User & operations interfaces</p></div>
+    <div class="arrow">→</div>
+    <div class="arch-box"><strong>Spring Boot</strong><p style="color:var(--muted);margin-top:6px">Application & business logic</p></div>
+    <div class="arrow">→</div>
+    <div class="arch-box"><strong>MySQL</strong><p style="color:var(--muted);margin-top:6px">Users, slots & bookings</p></div>
+  </div>
+</div>
+</section>
+
+<section class="section" id="tech">
+<div class="container">
+  <div class="section-head reveal">
+    <div class="kicker">07 · Technology Stack</div>
+    <h2>Built with a practical backend stack</h2>
+  </div>
+  <div class="tech reveal">
+    <span>☕ Java</span><span>⚡ Spring Boot</span><span>🗄 MySQL</span><span>📦 Maven</span>
+  </div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+  <div class="cta reveal">
+    <div class="kicker">08 · Conclusion</div>
+    <h2>Making Parking Smarter, Faster & Simpler</h2>
+    <p style="color:var(--muted);max-width:720px;margin:15px auto 25px">
+      ParkSphere is presented as a smart, fast, reliable and scalable parking management system that helps users find and book parking easily while improving overall parking efficiency.
+    </p>
+    <div class="actions" style="justify-content:center">
+      <a class="btn" href="#home">Back to Top ↑</a>
+    </div>
+  </div>
+</div>
+</section>
+</main>
+
+<footer>
+  <div class="container" style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap">
+    <span><strong>ParkSphere</strong> · Parking Management System</span>
+    <span>Fabtech College of Polytechnic · Department of Computer Science Engineering</span>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('show');
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
